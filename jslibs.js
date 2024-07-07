@@ -38,27 +38,25 @@ function getHeader() {
 }
 
 function getSortUrl() {
-    (() => {
-        let base = "https://www.baidu.com/";
-        let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
-        let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
-        if (!str) return arr.join('\n');
-        try {
-            hide = parse(str || "[]");
-        } catch (e) {
-            log(e.name + ": " + e.message);
-        }
-        if (!Array.isArray(hide) || hide.length < 1) return arr.join('\n');
-        list = arr.filter((x, i) => hide.indexOf(i + 1) < 0).join('\n');
-        //log(list+"\n");
-        hide.forEach(arr => {
-            if (!Array.isArray(arr)) return;
-            arr[0]--;
-            list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
-        });
-        log(list);
-        return list;
-    })();
+    let base = "https://www.baidu.com/";
+    let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
+    let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
+    if (!str) return arr.join('\n');
+    try {
+        hide = parse(str || "[]");
+    } catch (e) {
+        log(e.name + ": " + e.message);
+    }
+    if (!Array.isArray(hide) || hide.length < 1) return arr.join('\n');
+    list = arr.filter((x, i) => hide.indexOf(i + 1) < 0).join('\n');
+    //log(list+"\n");
+    hide.forEach(arr => {
+        if (!Array.isArray(arr)) return;
+        arr[0]--;
+        list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
+    });
+    log(list);
+    return list;
 }
 
 function getRuleArticles() {
