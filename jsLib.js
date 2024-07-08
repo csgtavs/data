@@ -18,7 +18,7 @@ function log(x) { this.java.log(x); return x; }
 function longToast(x) { this.java.longToast(x); }
 function t2s(x) { return String(this.java.t2s(x)) }
 function s2t(x) { return String(this.java.s2t(x)) }
-function baseMatch(x) { return String(this.baseUrl.match(x)); }
+//function baseMatch(x) { return String(this.baseUrl.match(x)); }
 function setV(x) { this.source.setVariable(String(x || "")) }
 function getV() { return String(this.source.getVariable()).trim(); }
 function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取失败!"); return ""; } }
@@ -37,26 +37,35 @@ function getHeader() {
     return objfy({ "User-Agent": iosUA });
 }
 
+function exec(func) {
+    if (typeof func !== "function") { return this.java.log('exec@not function') }
+    let str = func.toString();
+    return str.substring(str.indexOf('{') + 1, str.lastIndexOf('}'));
+    //return func.toString().match(/^function.*?\{([\s\S]+)\}$/)[1];
+}
+
 function getSortUrl() {
-    let base = "https://www.baidu.com/";
-    let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
-    let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
-    if (!str) return arr.join('\n');
-    try {
-        hide = parse(str || "[]");
-    } catch (e) {
-        log(e.name + ": " + e.message);
-    }
-    if (!Array.isArray(hide) || hide.length < 1) return arr.join('\n');
-    list = arr.filter((x, i) => hide.indexOf(i + 1) < 0).join('\n');
-    //log(list+"\n");
-    hide.forEach(arr => {
-        if (!Array.isArray(arr)) return;
-        arr[0]--;
-        list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
-    });
-    log(list);
-    return list;
+    (() => {
+        let base = "https://www.baidu.com/";
+        let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
+        let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
+        if (!str) return arr.join('\n');
+        try {
+            hide = parse(str || "[]");
+        } catch (e) {
+            log(e.name + ": " + e.message);
+        }
+        if (!Array.isArray(hide) || hide.length < 1) return arr.join('\n');
+        list = arr.filter((x, i) => hide.indexOf(i + 1) < 0).join('\n');
+        //log(list+"\n");
+        hide.forEach(arr => {
+            if (!Array.isArray(arr)) return;
+            arr[0]--;
+            list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
+        });
+        log(list);
+        return list;
+    })();
 }
 
 function getRuleArticles() {
@@ -67,7 +76,7 @@ function getRuleArticles() {
         list = list.filter((x, i) => hide.indexOf(i + 1) === -1);
     }
     let key = getV(), code = encode(key), add = `　🔎 ${key}`;
-    return key ? (toast(add), list.map(obj => {
+    key ? (toast(add), list.map(obj => {
         let { title, href, search } = obj;
         if (title.includes('发布')) { return obj; }
         obj.href = search
@@ -77,7 +86,7 @@ function getRuleArticles() {
     })) : list;
 }
 
-//logUrl
+//loginUrl
 
 var helpUrl = "https://csgta.tawk.help/",
     longToastStr = `
@@ -88,88 +97,89 @@ var helpUrl = "https://csgta.tawk.help/",
 2、设置后需【右上角】点击【刷新分类】内容后重新生成；
 3、格式错误，为数组格式，不能含有空项，重复项会覆盖前面的`;
 
-
-function t2sV() {
-    let x = getV(), y = t2s(x);
-    x === y ? toast(`【${x}】中不含可转繁体字符！`)
-        : (setV(y), toast(`成功：${x} => ${y}`));
-}
-
-function s2tV() {
-    let x = getV(), y = s2t(x);
-    x === y ? toast(`【${x}】中不含可转简体字符！`)
-        : (setV(y), toast(`成功：${x} => ${y}`));
-}
-
-function getKey(x) {
-    return String(this.result.get(x || 'input/输入')).trim();
-}
-
-function showV() {
-    let k = getV();
-    k ? toast('当前源变量为：' + k) : toast('当前源变量为空或空白符！');
-}
-
-function repV() {
-    let x = getV(), y = getKey();
-    if (!y) {
-        return toast('输入为空！如需清空请点清空键');
+function loginUrl() {
+    function t2sV() {
+        let x = getV(), y = t2s(x);
+        x === y ? toast(`【${x}】中不含可转繁体字符！`)
+            : (setV(y), toast(`成功：${x} => ${y}`));
     }
-    x === y ? toast(`输入"${x}"重复！`)
-        : (setV(y), toast(`成功：${x} => ${y}`));
-}
 
-function clearV() {
-    let key = getV(); setV("");
-    getV() ? toast(`失败！`) : toast(`已成功清除源变量：${key} `);
-}
-
-function toTry(x) {
-    try {
-        x();
-    } catch (e) {
-        toast(e.name + "：" + e.message);
+    function s2tV() {
+        let x = getV(), y = s2t(x);
+        x === y ? toast(`【${x}】中不含可转简体字符！`)
+            : (setV(y), toast(`成功：${x} => ${y}`));
     }
-}
 
-function more(x) {
-    try {
-        this.java.startBrowser(x || helpUrl, "开始");
-    } catch (e) {
-        toast(e.name + e.message);
+    function getKey(x) {
+        return String(this.result.get(x || 'input/输入')).trim();
     }
-}
 
-function open() {
-    let url = getKey();
-    String(url).startsWith('http')
-        ? more(url)
-        : toast("请输入完整的网址！");
-}
+    function showV() {
+        let k = getV();
+        k ? toast('当前源变量为：' + k) : toast('当前源变量为空或空白符！');
+    }
 
-
-function translate(to, from) {
-    let str = getKey();
-    if (!str) {
-        let key = getV();
-        if (key) {
-            str = key;
-            toast(`输入为空，取源变量："${key}" 翻译！`);
-        } else {
-            return toast(`请先输入内容或设置源变量！`);
+    function repV() {
+        let x = getV(), y = getKey();
+        if (!y) {
+            return toast('输入为空！如需清空请点清空键');
         }
-    } else {
-        toast('请稍等，翻译结果将自动存为源变量！')
+        x === y ? toast(`输入"${x}"重复！`)
+            : (setV(y), toast(`成功：${x} => ${y}`));
     }
-    let lang = {
-        ja: "japanese",
-        zh: "chinese_simplified",
-        en: "english",
-        kr: "korean"
+
+    function clearV() {
+        let key = getV(); setV("");
+        getV() ? toast(`失败！`) : toast(`已成功清除源变量：${key} `);
     }
-    //toast(lang[from || 'zh'] + "@" + lang[to || 'en']);
-    let data = this.java.webView(`
-    <script src="https://cdn.staticfile.net/translate.js/3.1.5/translate.js"></script>       
+
+    function toTry(x) {
+        try {
+            x();
+        } catch (e) {
+            toast(e.name + "：" + e.message);
+        }
+    }
+
+    function more(x) {
+        try {
+            this.java.startBrowser(x || helpUrl, "开始");
+        } catch (e) {
+            toast(e.name + e.message);
+        }
+    }
+
+    function open() {
+        let url = getKey();
+        String(url).startsWith('http')
+            ? more(url)
+            : toast("请输入完整的网址！");
+    }
+    
+    let login = x => 10
+
+    function translate(to, from) {
+        let str = getKey();
+        if (!str) {
+            let key = getV();
+            if (key) {
+                str = key;
+                toast(`输入为空，取源变量："${key}" 翻译！`);
+            } else {
+                return toast(`请先输入内容或设置源变量！`);
+            }
+        } else {
+            toast('请稍等，翻译结果将自动存为源变量！')
+        }
+        let lang = {
+            ja: "japanese",
+            zh: "chinese_simplified",
+            en: "english",
+            kr: "korean"
+        }
+        //toast(lang[from || 'zh'] + "@" + lang[to || 'en']);
+        let data = this.java.webView(`
+    <script src="https://cdn.jsdelivr.net/gh/csgtavs/data/translate.min.js"></script>       
     <script>
     translate.service.use('client.edge');
     translate.language.clearCacheLanguage();
@@ -179,12 +189,13 @@ function translate(to, from) {
        window.myData = data;        
     });
     </script>`, "https://www.translate.com/", "myData");
-    data = parse(data);
-    let text = data.text[0];
-    if (!text) { return toast("翻译失败！"); }
-    toast(`翻译成功：${str} => ${text}`);
-    if (!text.includes(' ')) { text = text.toLowerCase() };
-    setV(text);
+        data = parse(data);
+        let text = data.text[0];
+        if (!text) { return toast("翻译失败！"); }
+        toast(`翻译成功：${str} => ${text}`);
+        if (!text.includes(' ')) { text = text.toLowerCase() };
+        setV(text);
+    }
 }
 
 //data
