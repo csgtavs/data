@@ -14,7 +14,7 @@ var winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML
 
 var winHeader = `,${header(winUA)}`;
 
-var stk="测试成功";
+//var stk="测试成功";
 function execute(fn) { return eval(`(${fn})()`); }
 
 function toast(x) { this.java.toast(x); }
