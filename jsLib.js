@@ -13,6 +13,8 @@ var winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML
 
 var winHeader = `,${header(winUA)}`;
 
+function execute(fn) { return eval(`(${fn})()`); }
+
 function toast(x) { this.java.toast(x); }
 function log(x) { this.java.log(x); return x; }
 function longToast(x) { this.java.longToast(x); }
@@ -76,7 +78,7 @@ function getRuleArticles() {
         list = list.filter((x, i) => hide.indexOf(i + 1) === -1);
     }
     let key = getV(), code = encode(key), add = `　🔎 ${key}`;
-    key ? (toast(add), list.map(obj => {
+    list = key ? (toast(add), list.map(obj => {
         let { title, href, search } = obj;
         if (title.includes('发布')) { return obj; }
         obj.href = search
