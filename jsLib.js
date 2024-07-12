@@ -6,7 +6,7 @@ var parse = x => JSON.parse(x),
     //random = x => Math.cell(x * Math.random()),
     objfy = (x, n) => n > 1 ? JSON.stringify(x, null, n) : JSON.stringify(x),
     header = (x, y) => JSON.stringify({ headers: { Referer: y, "User-Agent": x || andUA } });
-var stk="测试成功";
+
 
 var winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
     andUA = "Mozilla/5.0 (Linux; Android 11; V2069A Build/RP1A.200720.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/108.0.5359.128 Mobile Safari/537.36",
@@ -14,6 +14,7 @@ var winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML
 
 var winHeader = `,${header(winUA)}`;
 
+var stk="测试成功";
 function execute(fn) { return eval(`(${fn})()`); }
 
 function toast(x) { this.java.toast(x); }
