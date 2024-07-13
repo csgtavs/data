@@ -2,53 +2,60 @@ var parse = x => JSON.parse(x),
     trim = x => String(x).trim(),
     times = () => new Date().getTime(),
     encode = x => encodeURIComponent(x),
-    //decode = x => decodeURIComponent(x),
-    //random = x => Math.cell(x * Math.random()),
     objfy = (x, n) => n > 1 ? JSON.stringify(x, null, n) : JSON.stringify(x),
     header = (x, y) => JSON.stringify({ headers: { Referer: y, "User-Agent": x || andUA } });
 
-
-var winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+var Url = "https://raw.githubusercontent.com/csgtavs/data/main/jsLib.js",
+    winUA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
     andUA = "Mozilla/5.0 (Linux; Android 11; V2069A Build/RP1A.200720.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/108.0.5359.128 Mobile Safari/537.36",
-    iosUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Snapchat/10.77.5.59 (like Safari/604.1)";
+    iosUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Snapchat/10.77.5.59 (like Safari/604.1)",
+    winHeader = `,${header(winUA)}`,
+    helpUrl = "https://csgta.tawk.help/",
+    translateJs = "https://cdn.jsdelivr.net/gh/csgtavs/data/translate.min.js",
+    longToastStr = `例如填写：[1,[3,2,4],5]，表示隐藏（从左往右）第1栏、第5栏、第3栏的第2和第4项。
+此功能用于去除您不认同/需要的栏目/子项，如果不生效或异常可能是因为：
+1、未完成登录（点击【登录】上方【√】）；
+2、设置后需【右上角】点击【刷新分类】内容后重新生成；
+3、格式错误，为数组格式，不能含有空项，重复项会覆盖前面的`;
 
-var winHeader = `,${header(winUA)}`;
-
-//var stk="测试成功";
 function execute(fn) { return eval(`(${fn})()`); }
-
 function toast(x) { this.java.toast(x); }
 function log(x) { this.java.log(x); return x; }
 function longToast(x) { this.java.longToast(x); }
 function t2s(x) { return String(this.java.t2s(x)) }
 function s2t(x) { return String(this.java.s2t(x)) }
-//function baseMatch(x) { return String(this.baseUrl.match(x)); }
 function setV(x) { this.source.setVariable(String(x || "")) }
 function getV() { return String(this.source.getVariable()).trim(); }
 function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取失败!"); return ""; } }
-function trans(x, y, z) {
-    switch (arguments.length) {
-        case 1: return x === null ? "" : typeof x === 'object' ? String(x) : x;
-        case 2: return x ? x : y;
-        case 3: return x === y ? z : x;
-        default: this.java.log("$ doesn't work！");
-    }
-}
-
-//rule
-
-function getHeader() {
-    return objfy({ "User-Agent": iosUA });
-}
-
+function getHeader(x) { return x ? x = cache.get('nowUA') ? objfy({ "User-Agent": x }) : "" : "" }
 function exec(func) {
     if (typeof func !== "function") { return this.java.log('exec@not function') }
     let str = func.toString();
     return str.substring(str.indexOf('{') + 1, str.lastIndexOf('}'));
-    //return func.toString().match(/^function.*?\{([\s\S]+)\}$/)[1];
+}
+
+
+function importJs(url) {
+    let { java, cache } = this;
+    url = url || Url;
+    try {
+        return String(java.cacheFile(url));
+    } catch (e) {
+        try {
+            let text = String(java.importScript(url));
+            java.toast(`网络不佳，使用缓存@${e.name}:${e.message}`);
+            return text;
+        } catch (x) {
+            java.toast(`请检查或切换网络！@${x.name}:${x.message}`);
+        }
+    }
 }
 
 function getSortUrl() {
+    eval(importJs(Url));
+    cache.put('datas', datas);
+    cache.put('getLoginUrl', getLoginUrl);
+    cache.put('getRuleArticle', getRuleArticle);
     (() => {
         let base = "https://www.baidu.com/";
         let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
@@ -92,16 +99,7 @@ function getRuleArticles() {
 
 //loginUrl
 
-var helpUrl = "https://csgta.tawk.help/",
-    longToastStr = `
-例如填写：[1,[3,2,4],5]，表示隐藏（从左往右）第1栏、第5栏、第3栏的第2和第4项。
-此功能用于去除您不认同/需要的栏目/子项，如果不生效或异常可能是因为：
-
-1、未完成登录（点击【登录】上方【√】）；
-2、设置后需【右上角】点击【刷新分类】内容后重新生成；
-3、格式错误，为数组格式，不能含有空项，重复项会覆盖前面的`;
-
-function loginUrl() {
+function getLoginUrl() {
     function t2sV() {
         let x = getV(), y = t2s(x);
         x === y ? toast(`【${x}】中不含可转繁体字符！`)
@@ -145,22 +143,24 @@ function loginUrl() {
         }
     }
 
-    function more(x) {
+    function open(x) {
         try {
-            this.java.startBrowser(x || helpUrl, "开始");
+            let str = '网址无法打开！';
+            if (!x) {
+                x = getKey();
+                str = "不是完整网址！";
+            } else if (x.startsWith('http')) {
+                x = x;
+            } else {
+                x = cache.get(x);
+            }
+            x.startsWith('http') ? java.startBrowser(x) : toast(str);
         } catch (e) {
             toast(e.name + e.message);
         }
     }
 
-    function open() {
-        let url = getKey();
-        String(url).startsWith('http')
-            ? more(url)
-            : toast("请输入完整的网址！");
-    }
-    
-    let login = x => 10
+    let login = x => 10;
 
     function translate(to, from) {
         let str = getKey();
@@ -183,7 +183,9 @@ function loginUrl() {
         }
         //toast(lang[from || 'zh'] + "@" + lang[to || 'en']);
         let data = this.java.webView(`
-    <script src="https://cdn.jsdelivr.net/gh/csgtavs/data/translate.min.js"></script>       
+    <script>
+    ${java.importScript(translateJs)}
+    </script>
     <script>
     translate.service.use('client.edge');
     translate.language.clearCacheLanguage();
@@ -593,3 +595,50 @@ var datas = [
         list: []
     }
 ];
+
+/*
+
+function updateSource() {
+    let url = Url;
+    let name = java.downloadFile(url);
+    let n2 = java.md5Encode16(url);
+    java.log(n1);
+    java.log(n2);
+    try {
+        java.cacheFile(url);
+    } catch (e) {
+        java.importScript(url);
+    }
+}
+
+
+
+try {
+    eval(String(java.cacheFile(Url)));
+    eval(exec(loginUrl));
+} catch (e) {
+    java.log("同步失败");
+    let str = java.importScript(Url);
+    if (str) {
+        eval(String(str));
+        eval(exec(loginUrl));
+    } else {
+        java.toast('网络异常，检查网络！');
+    }
+}
+*/
+
+/*
+function trans(x, y, z) {
+    switch (arguments.length) {
+        case 1: return x === null ? "" : typeof x === 'object' ? String(x) : x;
+        case 2: return x ? x : y;
+        case 3: return x === y ? z : x;
+        default: this.java.log("$ doesn't work！");
+    }
+}
+*/
+//decode = x => decodeURIComponent(x),
+//random = x => Math.cell(x * Math.random()),
+//rule
+//return func.toString().match(/^function.*?\{([\s\S]+)\}$/)[1];
