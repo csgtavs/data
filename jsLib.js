@@ -603,3 +603,4 @@ function getLoginUrl() {
         if (!text.includes(' ')) { text = text.toLowerCase() };
         setV(text);
     }
+}
