@@ -61,7 +61,7 @@ function getCacheDatas() {
     cache.put('translateJs', translateJs);
     cache.put('longToastStr', longToastStr);
     cache.put('getLoginUrl', getLoginUrl);
-    cache.put('getRuleArticle', getRuleArticle);
+    cache.put('getRuleArticles', getRuleArticles);
     cache.put('sourceUrl', "https://www.coolapk.com/link?url=legado://import/bookSource?src=https://qyyuapi.com/json/V2.2.json");
     var datas = [
         {
@@ -603,4 +603,3 @@ function getLoginUrl() {
         if (!text.includes(' ')) { text = text.toLowerCase() };
         setV(text);
     }
-}
