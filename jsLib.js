@@ -555,6 +555,7 @@ function getLoginUrl() {
             java.ajax(url);
             java.deleteFile(java.downloadFile(url));
             java.importScript(url);
+            toast('更新成功！');
         } catch (e) {
             toast(error(e, '更新失败'));
         }
