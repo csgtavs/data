@@ -460,7 +460,7 @@ function getSortUrl() {
         let base = "https://www.baidu.com/";
         let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
         let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
-        if (!str) return log(arr.join('\n'));
+        if (!str) return arr.join('\n');
         try {
             hide = parse(str || "[]");
         } catch (e) {
@@ -474,7 +474,6 @@ function getSortUrl() {
             arr[0]--;
             list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
         });
-        log(list);
         return list;
     })();
 }
