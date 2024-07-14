@@ -1,3 +1,4 @@
+
 var parse = x => JSON.parse(x),
     trim = x => String(x).trim(),
     times = () => new Date().getTime(),
@@ -14,7 +15,7 @@ function t2s(x) { return String(this.java.t2s(x)) }
 function s2t(x) { return String(this.java.s2t(x)) }
 function setV(x) { this.source.setVariable(String(x || "")) }
 function getV() { return String(this.source.getVariable()).trim(); }
-function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取失败!"); return ""; } }
+function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取map失败!"); return ""; } }
 function getHeader(x) { return x ? x = cache.get('nowUA') ? objfy({ "User-Agent": x }) : "" : "" }
 function importJs(url) {
     let java = this.java;
@@ -459,7 +460,7 @@ function getSortUrl() {
         let base = "https://www.baidu.com/";
         let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
         let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
-        if (!str) return arr.join('\n');
+        if (!str) return log(arr.join('\n'));
         try {
             hide = parse(str || "[]");
         } catch (e) {
