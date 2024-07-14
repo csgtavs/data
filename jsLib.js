@@ -77,7 +77,7 @@ function getCacheDatas() {
     cache.put('longToastStr', longToastStr);
     cache.put('getLoginUrl', getLoginUrl.toString());
     cache.put('getRuleArticles', getRuleArticles.toString());
-    cache.put('sourceUrl', "https://www.coolapk.com/link?url=legado://import/bookSource?src=https://raw.githubusercontent.com/csgtavs/data/main/collectRss-20240714.json");
+    cache.put('sourceUrl', "https://www.coolapk.com/link?url=legado://import/auto?src=https://raw.githubusercontent.com/csgtavs/data/main/collectRss-20240714.json");
     var datas = [
         {
             class: "🏳️‍🌈同性gay",
