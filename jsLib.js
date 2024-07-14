@@ -456,7 +456,7 @@ function getCacheDatas() {
 }
 
 function getSortUrl() {
-    (() => {
+    let sortList, sortUrl = () => {
         let base = "https://www.baidu.com/";
         let list, hide, str = getMap('需隐藏的栏目').replace(/\s+/g, "");
         let arr = datas.map((x, i) => `${x.class}[${x.list.length}]::${base}#${i}`);
@@ -475,7 +475,8 @@ function getSortUrl() {
             list = list.replace(new RegExp(`#${arr[0]}.*`), `#${arr.join(",")}`);
         });
         return list;
-    })();
+    }
+    sortList = sortUrl() ? (cache.put('sortUrl', sortUrl), sortUrl) : cache.get('sortUrl');
 }
 
 function getRuleArticles() {
