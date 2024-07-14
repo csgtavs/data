@@ -476,7 +476,8 @@ function getSortUrl() {
         });
         return list;
     })();
-    sortUrl = sortUrl ? (cache.put('sortUrl', sortUrl), sortUrl) : cache.get('sortUrl'); log(sortUrl);
+    sortUrl = sortUrl ? (cache.put('sortUrl', sortUrl), sortUrl) : cache.get('sortUrl');
+    log(sortUrl);
 }
 
 function getRuleArticles() {
