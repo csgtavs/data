@@ -1,4 +1,3 @@
-
 var parse = x => JSON.parse(x),
     trim = x => String(x).trim(),
     times = () => new Date().getTime(),
@@ -60,8 +59,8 @@ function getCacheDatas() {
     cache.put("helpUrl", helpUrl);
     cache.put('translateJs', translateJs);
     cache.put('longToastStr', longToastStr);
-    cache.put('getLoginUrl', getLoginUrl);
-    cache.put('getRuleArticles', getRuleArticles);
+    cache.put('getLoginUrl', getLoginUrl.toString());
+    cache.put('getRuleArticles', getRuleArticles.toString());
     cache.put('sourceUrl', "https://www.coolapk.com/link?url=legado://import/bookSource?src=https://qyyuapi.com/json/V2.2.json");
     var datas = [
         {
@@ -452,7 +451,7 @@ function getCacheDatas() {
             list: []
         }
     ];
-    cache.put('datas', datas);
+    cache.put('datas', objfy(datas));
 }
 
 function getSortUrl() {
@@ -480,7 +479,7 @@ function getSortUrl() {
 }
 
 function getRuleArticles() {
-    let datas = cache.get('datas');
+    let datas = parse(cache.get('datas'));
     let id = baseUrl.match(/#(\d+),?(.*)/);
     let hide = id[2] ? id[2].split(',').map(x => +x) : [];
     let list = parse(objfy(datas[+id[1]]["list"] || []));
