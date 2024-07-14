@@ -28,7 +28,10 @@ function setV(x) { this.source.setVariable(String(x || "")) }
 function getV() { return String(this.source.getVariable()).trim(); }
 function logToast(x, y) { this.java.log(x); this.java.toast(x); return y; }
 function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取map失败!"); return ""; } }
-function getHeader(x) { return x ? x = cache.get('nowUA') ? objfy({ "User-Agent": x }) : "" : "" }
+function getHeader(x) {
+    x = this.cache.get(x || 'nowUA') || x;
+    return x ? objfy({ "User-Agent": x }) : ""
+}
 function importJs(url) {
     let java = this.java;
     url = url || Url;
