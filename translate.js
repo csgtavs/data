@@ -5,7 +5,7 @@
 	开原仓库：https://github.com/xnx3/translate
 
  */
-var translate = {
+window.translate = {
 	/*
 	 * 当前的版本
 	 */
