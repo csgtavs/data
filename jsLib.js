@@ -1,4 +1,4 @@
-
+Url = "https://raw.githubusercontent.com/csgtavs/data/main/jsLib.js";
 var parse = x => JSON.parse(x),
     trim = x => String(x).trim(),
     times = () => new Date().getTime(),
@@ -6,7 +6,18 @@ var parse = x => JSON.parse(x),
     objfy = (x, n) => n > 1 ? JSON.stringify(x, null, n) : JSON.stringify(x),
     header = (x, y) => JSON.stringify({ headers: { Referer: y, "User-Agent": x || andUA } }),
     evalfn = (fn) => { return eval(`(${fn})()`); },
-    exec = (fn) => { let str = fn.toString(); return str.substring(str.indexOf('{') + 1, str.lastIndexOf('}')); }
+    error = (x, y) => `${y ? y + '：' : ''}${x.name}@${x.message}`;
+
+function exec(fn) {
+    let str = String(fn);
+    try {
+        return str.substring(str.indexOf('{') + 1, str.lastIndexOf('}'));
+    } catch (e) {
+        let err = error(e);
+        this.java.log(err);
+        this.java.toast(err);
+    }
+}
 
 function toast(x) { this.java.toast(x); }
 function log(x) { this.java.log(x); return x; }
@@ -15,6 +26,7 @@ function t2s(x) { return String(this.java.t2s(x)) }
 function s2t(x) { return String(this.java.s2t(x)) }
 function setV(x) { this.source.setVariable(String(x || "")) }
 function getV() { return String(this.source.getVariable()).trim(); }
+function logToast(x, y) { this.java.log(x); this.java.toast(x); return y; }
 function getMap(x) { try { return String(this.source.getLoginInfoMap().get(x)); } catch { this.java.log("获取map失败!"); return ""; } }
 function getHeader(x) { return x ? x = cache.get('nowUA') ? objfy({ "User-Agent": x }) : "" : "" }
 function importJs(url) {
@@ -28,10 +40,10 @@ function importJs(url) {
     } catch (e) {
         try {
             let text = String(java.importScript(url));
-            java.toast(`网络不佳，使用缓存@${e.name}:${e.message}`);
+            java.toast(`网络不佳，使用缓存：${error(e)}`);
             return text;
         } catch (x) {
-            java.toast(`请检查或切换网络！@${x.name}:${x.message}`);
+            java.toast(`请检查或切换网络！${error(e)}`);
         }
     }
 }
@@ -43,7 +55,7 @@ function getCacheDatas() {
         andUA = "Mozilla/5.0 (Linux; Android 11; V2069A Build/RP1A.200720.012; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/108.0.5359.128 Mobile Safari/537.36",
         iosUA = "Mozilla/5.0 (iPhone; CPU iPhone OS 13_3_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Mobile/15E148 Snapchat/10.77.5.59 (like Safari/604.1)",
         helpUrl = "https://csgta.tawk.help/",
-        translateJs = "https://cdn.jsdelivr.net/gh/csgtavs/data/translate.min.js",
+        translateJsUrl = "https://cdn.jsdelivr.net/gh/csgtavs/data/translate.min.js",
         winHeader = `,${header(winUA) || ""}`,
         longToastStr = `例如填写：[1,[3,2,4],5]，表示隐藏（从左往右）第1栏、第5栏、第3栏的第2和第4项。
 此功能用于去除您不认同/需要的栏目/子项，如果不生效或异常可能是因为：
@@ -58,7 +70,7 @@ function getCacheDatas() {
     }
     cache.put("nowUA", iosUA);
     cache.put("helpUrl", helpUrl);
-    cache.put('translateJs', translateJs);
+    cache.put('translateJsUrl', translateJsUrl);
     cache.put('longToastStr', longToastStr);
     cache.put('getLoginUrl', getLoginUrl.toString());
     cache.put('getRuleArticles', getRuleArticles.toString());
@@ -464,7 +476,7 @@ function getSortUrl() {
         try {
             hide = parse(str || "[]");
         } catch (e) {
-            log(e.name + ": " + e.message);
+            log(error(e));
         }
         if (!Array.isArray(hide) || hide.length < 1) return arr.join('\n');
         list = arr.filter((x, i) => hide.indexOf(i + 1) < 0).join('\n');
@@ -502,20 +514,21 @@ function getRuleArticles() {
 //loginUrl
 
 function getLoginUrl() {
+
+    function getKey(x) {
+        return String(this.result.get(x || 'input/输入')).trim();
+    }
+
     function t2sV() {
         let x = getV(), y = t2s(x);
-        x === y ? toast(`【${x}】中不含可转繁体字符！`)
+        x === y ? toast(`源变量"${x}"中不含可转繁体字符！`)
             : (setV(y), toast(`成功：${x} => ${y}`));
     }
 
     function s2tV() {
         let x = getV(), y = s2t(x);
-        x === y ? toast(`【${x}】中不含可转简体字符！`)
+        x === y ? toast(`源变量"${x}"中不含可转简体字符！`)
             : (setV(y), toast(`成功：${x} => ${y}`));
-    }
-
-    function getKey(x) {
-        return String(this.result.get(x || 'input/输入')).trim();
     }
 
     function showV() {
@@ -532,20 +545,27 @@ function getLoginUrl() {
             : (setV(y), toast(`成功：${x} => ${y}`));
     }
 
-    function clearV() {
-        let key = getV(); setV("");
-        getV() ? toast(`失败！`) : toast(`已成功清除源变量：${key} `);
+    function updateJs(key) {
+        let url = cache.get(key);
+        if (!(url && url.startsWith('http'))) return toast('无法更新！');
+        try {
+            java.ajax(url);
+            java.deleteFile(java.downloadFile(url));
+            java.importScript(url);
+        } catch (e) {
+            toast(error(e, '更新失败'));
+        }
     }
 
     function toTry(x) {
         try {
             x();
         } catch (e) {
-            toast(e.name + "：" + e.message);
+            toast(error(e));
         }
     }
 
-    function open(x) {
+    function open(x, y) {
         try {
             let str = '网址无法打开！';
             if (!x) {
@@ -556,9 +576,9 @@ function getLoginUrl() {
             } else {
                 x = cache.get(x);
             }
-            x.startsWith('http') ? java.startBrowser(x) : toast(str);
+            x.startsWith('http') ? java.startBrowser(x, y || '') : toast(str);
         } catch (e) {
-            toast(e.name + e.message);
+            toast(error(e));
         }
     }
 
@@ -584,9 +604,9 @@ function getLoginUrl() {
             kr: "korean"
         }
         //toast(lang[from || 'zh'] + "@" + lang[to || 'en']);
-        let data = this.java.webView(`
+        let data = java.webView(`
     <script>
-    ${java.importScript(translateJs)}
+    ${java.importScript(cache.get('translateJsUrl'))}
     </script>
     <script>
     translate.service.use('client.edge');
