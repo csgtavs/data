@@ -1,4 +1,5 @@
-{
+[
+    {
     "articleStyle": 0,
     "concurrentRate": "",
     "contentBlacklist": "//.*\\.gif,\n//https://pic.zhliua.cn.*gif,\n//.*/ads.js,\n//.*\\.gif,\nhttps://cdn.ouo.io/js/full-page-script.js,\nhttps://js.juicyads.com,\nhttps://poweredby.jads.co/js/jads.js,\nhttps://tsyndicate.com,\nhttps://js.wpadmngr.com/static/adManager.js,,\nhttps://l.erodatalabs.com,\u0016\nhttps://blogger.googleusercontent.com/,\nhttps://img.strpst.com/,\nhttps://www.002st.top/,\n//instgramen,\nhttps://poweredby.jads.co/js/jads.js,\nhttps://creative.rmhfrtnd.com,\nhttps://nineonebuf.oss-cn-chengdu.aliyuncs.com/.*.gif",
@@ -32,4 +33,5 @@
     "sourceUrl": "ssr<2.30>",
     "style": "/*\nd = new Date();\nt = d.getTime() - (page - 1) * 1000 * 24 * 60 * 60;\njava.log(t);\nt1 = java.timeFormat(t);\nt2 = String(t1).replace(/(.*)\\/(.*)\\/(.*) .*/, '$1-$2-$3');\njava.log(t2);\njava.toast(t2);\nt2\n*/\n\n/*\n\t        /*\n         var storage=window.localStorage;\n        localStorage.setItem(\"key\", \"value：47851\");\n        var aspx=localStorage.getItem(\"key\");\n        alert(aspx);\n        */\n/*\n\n*/\nalert(navigator.userAgent.toLowerCase());\n\ntry {\n    if (!window.localStorage) {\n        alert(\"浏览器不支持localstorage\");\n    } else {\n        if (localStorage.clickcount) {\n            localStorage.clickcount = Number(localStorage.clickcount) + 1;\n        } else {\n            localStorage.clickcount = 1;\n        }\n        var ctimes = \"你在按钮上已经点击了 \" + localStorage.clickcount + \"次。\";\n        alert(ctimes);\n    }\n} catch (err) {\n    alert(`@localStorage：\\n${err.name}：\\n${err.message}`);\n};\n\n               /*     金曼天堂专用\n               \n                */",
     "variableComment": "通过【设置源变量→下拉列表】方式或在登录新增一个关键词搜索结果\n如果列表结果过多，请点击右上角【清除】\n如果需要取消搜索，请清空源变量（登录/手动修改）"
-}
+    }
+]
